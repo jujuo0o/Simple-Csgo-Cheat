@@ -91,10 +91,8 @@ public:
 	static void Aimbot();
 	static void TriggerBot();
 	static void NoFlash();
-	static void NoRecoil();
 	static void BunnyHop();
 	static void Radar();
-	static void RageBot();
 	static Vector3 GetPlayerBonePos(UINT , int );
 	static bool WorldToScreen(const Vector3 In, Vector3* out,int width,int height);
 };

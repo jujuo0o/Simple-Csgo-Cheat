@@ -31,7 +31,6 @@ MODULEENTRY32 Memory::GetModuleEntry(const char * Module) {
 		std::cout << "Invalid";
 	}
 	HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE32 | TH32CS_SNAPMODULE, GetProcessId(pHandle));
-	//std::cout << "PID: " << GetProcessId(Memory::pHandle) << std::endl;
 	if (snap != INVALID_HANDLE_VALUE) {
 		MODULEENTRY32 rEntry;
 		rEntry.dwSize = sizeof(rEntry);
@@ -52,7 +51,6 @@ MODULEENTRY32 Memory::GetModuleEntry(const char * Module) {
 DWORD Memory::ScanPatternEx(HANDLE hProc, DWORD base, DWORD len, BYTE* sig, const char* mask, int offset)
 {
 	BYTE* buf = (BYTE*)VirtualAlloc(0, len, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	//buf = Memory::Read<BYTE*>((void*)(base));
 	if (ReadProcessMemory(hProc, (LPCVOID)base, buf, len, NULL) == false)
 	{
 		char buf2[64]; 
@@ -93,7 +91,6 @@ UINT Memory::FindPatternEx(const char* Module, const char* pattern, const char* 
 	{
 		
 		lpSigAddress = Memory::ScanPatternEx(Memory::pHandle, readLocation, 4096, (BYTE*)pattern, mask, offset);
-		//lpSigAddress = FindPattern((char*)opcode, bytesRead, pattern,mask);
 		if (lpSigAddress != 0)
 		{
 			return lpSigAddress;

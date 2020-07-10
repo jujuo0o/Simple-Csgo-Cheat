@@ -32,11 +32,3 @@ OffsetManager::OffsetManager()
 OffsetManager::~OffsetManager()
 {
 }
-
-void OffsetManager::SetupOffsets(DWORD pid) {
-	// Step 2: Get Addresses 
-	
-	
-
-}
-

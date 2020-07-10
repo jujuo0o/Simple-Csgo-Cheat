@@ -77,6 +77,5 @@ class OffsetManager
 public:
 	OffsetManager();
 	~OffsetManager();
-	void static SetupOffsets(DWORD pid);
 };
 

@@ -147,6 +147,7 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="About.h" />
     <ClInclude Include="FEATURE.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="OffsetManager.h" />

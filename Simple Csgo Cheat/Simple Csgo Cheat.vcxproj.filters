@@ -47,5 +47,8 @@
     <ClInclude Include="PLAYER.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="About.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

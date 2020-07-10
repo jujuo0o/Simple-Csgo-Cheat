@@ -92,7 +92,6 @@ float ScrToWorld(float x, float y, float z, float Ex, float Ey, float Ez) {
 
 bool FEATURE::WorldToScreen(const Vector3 In, Vector3* vOut,int width, int height) {
 	Matrix4x4 vMatrix;
-	//UINT clientState = Memory::Read<UINT>((void*)(Offsets::Modules::engineDll + Offsets::Player::dwClientState));
 	vMatrix = Memory::Read<Matrix4x4>((void*)(Offsets::Modules::panoramaDll + Offsets::Player::dwViewMatrix));
 
 	vOut->x = vMatrix.a * In.x + vMatrix.b * In.y + vMatrix.c * In.z + vMatrix.d;
@@ -256,7 +255,6 @@ UINT GetBestTarget(Vector3 viewAngles) {
 			bool eTmTAttack = false;
 			if (!ignore)eTmTAttack = true;
 			else if (isSpotted)eTmTAttack = true;
-			//Vector3 EntityPos = GetPlayerBonePos(Offsets::DynamicOffsets::eLIST[i]);
 			Vector3 EntityPos = GetClosestBone(Offsets::DynamicOffsets::eLIST[i]);
 			shortDist = ScrToWorld(PlayerPos.x, PlayerPos.y, PlayerPos.z, EntityPos.x, EntityPos.y, EntityPos.z);
 			Vector3 calAngles = CalcAngles(PlayerPos, EntityPos);
@@ -315,8 +313,6 @@ FEATURE::~FEATURE()
 
 void FEATURE::glowPlayers()
 {
-	//std::cout << "COUnt: " << Memory::Read<DWORD>((void*)(Offsets::DynamicOffsets::glowObjectManager + 0x4));
-	//PLAYER::getPlayers();
 	for (unsigned int i = 0; i < Offsets::DynamicOffsets::eLIST.size(); i++) {
 
 		int index = Memory::Read<int>((void*)(Offsets::DynamicOffsets::eLIST[i] + Offsets::Player::glow));
@@ -400,7 +396,6 @@ void FEATURE::Aimbot() {
 		UINT target = NULL;
 		Vector3 viewAngles = Memory::Read<Vector3>((void*)(clientState + Offsets::Player::dwClientState_ViewAngles));
 
-		//std::cout << " Target: " << target << std::endl;
 		DWORD Weapon = GetPlayerWeapon(Offsets::DynamicOffsets::LocalPlayer);
 		if (Weapon!=IS_GRENADE) {
 
@@ -409,8 +404,6 @@ void FEATURE::Aimbot() {
 			if (Weapon == IS_SMG || Weapon == IS_AR) {
 				AimPunch = Memory::Read<Vector2>((void*)(Offsets::DynamicOffsets::LocalPlayer + Offsets::Player::m_aimPunchAngle));
 			}
-			//AimPunch.x = AimPunch.x * 2.0f;
-			//AimPunch.y = AimPunch.y * 2.0f;
 			target = GetBestTarget(viewAngles);
 			if (target != NULL) {
 				Vector3 PlayerPosI = GetClosestBone(target);
@@ -418,7 +411,6 @@ void FEATURE::Aimbot() {
 				Vector3 entityAngles = CalcAnglesPunch(PlayerPos0, PlayerPosI,AimPunch);
 				// smooth angles //
 				Vector3 smoothAngles = { 0.f,0.f,0.f };
-				//smoothAngles = FindSmoothAngels(entityAngles,viewAngles);
 				SmoothAngles(AimPunch.x, AimPunch.y, &entityAngles, &smoothAngles, viewAngles, Offsets::DynamicOffsets::aimSmoothness);
 				float fo = std::hypotf(entityAngles.x, entityAngles.y);
 				if (fo < Offsets::DynamicOffsets::aimFOV) {
@@ -463,9 +455,6 @@ void FEATURE::Radar() {
 	}
 }
 
-void FEATURE::RageBot() {
-	
-}
 
 void FEATURE::TriggerBot() {
 	// get crosshair id //
@@ -474,23 +463,15 @@ void FEATURE::TriggerBot() {
 
 	bool fire = false;
 	if (CrossHairId > 0 && CrossHairId <65 ) {
-		//std::cout << "Enemy: " << CrossHairId << std::endl;
-		//std::cout << "Size : " << Offsets::DynamicOffsets::eId.size() << " id: " << CrossHairId << std::endl;
-		
 		DWORD player = Memory::Read<DWORD>((void*)(Offsets::DynamicOffsets::eLISTBASE + ((CrossHairId-1) * 0x10)));
 		DWORD playerTeam = Memory::Read<DWORD>((void*)(player+Offsets::Player::team));
 		// check if crosshair exists in Enemy Id's List //
-		//std::cout << "Player Team: " << playerTeam << " My team: " << Offsets::DynamicOffsets::playerTeam << std::endl;
 		if (playerTeam != Offsets::DynamicOffsets::playerTeam){
-			//std::cout << "Enemy: " << CrossHairId - 1 << std::endl;
 			fire = true;
 		}
-		//std::cout << " Here: " << std::endl;
 		if (fire) {
 			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-			//Memory::Write<int>((void *)(Offsets::Modules::panoramaDll + Offsets::Player::attack1), 5);
 			Sleep(Offsets::TriggerBotTime);
-			//Memory::Write<int>((void *)(Offsets::Modules::panoramaDll + Offsets::Player::attack1), 4);
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 			
 		}
@@ -502,47 +483,4 @@ void FEATURE::NoFlash() {
 	Memory::Write<float>((void*)(Offsets::DynamicOffsets::LocalPlayer + 0xA3F0),0.0f);
 
 }
-void FEATURE::NoRecoil() {
-	Vector2 punch, view, oldPunch, newAngles;
-	oldPunch.x = oldPunch.y = 0;
-	view.x = view.y = 0;
-	DWORD shotsFired = Memory::Read<DWORD>((void*)(Offsets::DynamicOffsets::LocalPlayer + Offsets::Player::m_iShotsFired));
-	if (GetAsyncKeyState(VK_LBUTTON)) {
-		std::cout << "Fire IN the hole " << std::endl;
-		
-		punch = Memory::Read<Vector2>((void*)(Offsets::DynamicOffsets::LocalPlayer + Offsets::Player::m_aimPunchAngle));
-		std::cout << "punch: x=" << punch.x << "punch: y="  << punch.y << std::endl;
-		unsigned int clientState = Memory::Read<unsigned int>((void*)(Offsets::Modules::engineDll + Offsets::Player::dwClientState));
-		view = Memory::Read<Vector2>((void*)(clientState + Offsets::Player::dwClientState_ViewAngles));
-		std::cout << "view: x=" << view.x << "punch: y=" << view.y << std::endl;
-		newAngles.x = (view.x + oldPunch.x) - (punch.x * 2.0f);
-		newAngles.y = (view.y + oldPunch.y) - (punch.y * 2.0f);
-		std::cout << "x: " << newAngles.x << " y: " << newAngles.y << std::endl;
-		// normalize the angles
-		while (newAngles.x > 180) {
-			newAngles.x -= 360;
-		}
-		while (newAngles.y < -180) {
-			newAngles.y += 360;
-		}
 
-		if (newAngles.x > 89.0f) {
-			newAngles.x = 89.0f;
-		}
-		if (newAngles.y < -89.0f) {
-			newAngles.y = -89.0f;
-		}
-
-
-		oldPunch.x = punch.x * 2.0f;
-		oldPunch.y = punch.y * 2.0f;
-		std::cout << "x: " << newAngles.x << " y: " << newAngles.y << std::endl;
-		Memory::Write<Vector2>((void*)(clientState + Offsets::Player::dwClientState_ViewAngles), { 0,0 });
-
-		//Sleep(10);
-		
-	}
-	else {
-		oldPunch.x = oldPunch.y = 0;
-	}
-}
